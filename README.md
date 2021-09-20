@@ -1,4 +1,5 @@
 # Projects
+All are written in Python
 Connect4 – a program that lets two users play a Connect 4 game. Players input a column number.
            Since the board consists of lists, the first column is chosen by inputting 0.
 
