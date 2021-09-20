@@ -1,4 +1,4 @@
-# fix column numbers
+
 class Board:
 
     def __init__(self):
@@ -49,7 +49,7 @@ class Board:
             for j in range(3):
                 combo_v[i].extend(self.board[j][i])
 
-        #  di check
+        #  Diagonal check
         combo_d = [self.board[0][2], self.board[1][1], self.board[2][0]]
         combo_d1 = [self.board[0][0], self.board[1][1], self.board[2][2]]
 
@@ -57,7 +57,7 @@ class Board:
                 ((combo_d1[0] == player) and (combo_d1[1] == player) and (combo_d1[2] == player)):
             return f"{player} won! Yay! D"
 
-        #  Vert checker
+        #  Vertical check
 
         for i in range(3):
             counter_v = 0
@@ -71,7 +71,7 @@ class Board:
                 if counter_v == 3:
                     return f"{player} won! Yay! V"
 
-        # Hor checker
+        # Horizontal check
 
         for i in range(3):
             counter_h = 0
@@ -183,7 +183,7 @@ class Board:
 
                 game.drop(int(column_x1), int(line_x1), second_player)
 
-            else:  # JUST IN CASE THERE MAY BE A BUG!
+            else:  
                 game.drop(int(column_x), int(line_x), second_player)
 
             print(game.output_board())
