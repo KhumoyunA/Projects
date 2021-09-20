@@ -13,7 +13,7 @@ attempts = 0
 
 while not status:
 
-    print(f"\nRemaining attempts: {3 - attempts}\n")
+    print(f"\n Remaining attempts: {3 - attempts}\n")
 
     if attempts == 3:
         print("You lost!")
