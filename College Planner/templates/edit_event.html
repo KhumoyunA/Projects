@@ -1,0 +1,77 @@
+<!--
+edit_event.html
+
+The page for writing information to edit an event
+
+Author(s): Alec Pilon, Mishwa Bhavsar
+Used Bootstrap for styling and Flask
+-->
+
+{% extends "main_template.html" %}
+{% include "styling.html" %}
+
+{% block body %}
+
+<div class="justify-content-md-center p-4 m-2">
+    <!-- form for updating existing information for an event -->
+    <form action="{{ url_for('update_entry') }}" method="post">
+        <h2 class="text-center pb-2">Edit Event</h2>
+        <div class="row-auto">
+            <div class="form-floating">
+                <input class="col form-control my-2" id="title" type="text" name="title" value="{{ task.title }}">
+                <label for="title">Title</label>
+            </div>
+            <div class="form-floating">
+                <input class="col form-control my-2" id="category" type="text" name="category"
+                       value="{{ task.category }}">
+                <label for="category">Category</label>
+            </div>
+        </div>
+
+        <div class="row-auto">
+            <div class="form-floating">
+                <input class="col form-control my-2 datepicker" type="text" id="st_date" name="st_date"
+                       value="{{ task.st_date }}">
+                <label for="st_date">Start Date</label>
+            </div>
+            <div class="form-floating">
+                <input class="col form-control my-2 timepicker" type="text" id="st_time" name="st_time"
+                       value="{{ task.st_time }}">
+                <label for="st_time">Start Time</label>
+            </div>
+        </div>
+
+        <div class="row-auto">
+            <div class="form-floating">
+                <input class="col form-control my-2 datepicker" id="en_date" type="text" name="en_date"
+                       value="{{ task.en_date }}">
+                <label for="en_date">End Date</label>
+            </div>
+            <div class="form-floating">
+                <input class="col form-control my-2 timepicker" id="en_time" type="text" name="en_time"
+                       value="{{ task.en_time }}">
+                <label for="en_time">End Time</label>
+            </div>
+            <div class="form-floating">
+                <textarea class="row-auto form-control my-2" id="description"
+                          name="description">{{ task.description }}</textarea>
+                <label for="description">Write any details here</label>
+            </div>
+        </div>
+
+        <input type="hidden" name="id" value="{{ task.id }}">
+        <input class="btn btn-dark" type="submit" value="Update Task">
+    </form>
+
+</div>
+<!-- datepicker info found on https://jqueryui.com/datepicker/#date-formats -->
+<script>
+    $(function () {
+        $(".datepicker").datepicker();
+    });
+
+    $(document).ready(function () {
+        $('input.timepicker').timepicker({interval: 15});
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,137 @@
+<!--
+show_events.html
+
+Home page once the user logs in, includes all tasks as they are input
+
+Author(s): Anna Sheaffer, Mishwa Bhavsar
+Used Bootstrap for styling and Flask
+Started 10/26/2022
+-->
+
+{% extends "main_template.html" %}
+{% include "styling.html" %}
+
+{% block body %}
+
+{% if session['logged_in'] == True -%}
+    {% include 'calendar.html' %}
+{% else %}
+{% endif %}
+
+<div id='events' class="container px-3 py-2 mt-5">
+    <div class="show_events">
+        <div class="row">
+            {% for task in tasks %}
+            <hr>
+            <div class="col text-center">
+                <!-- check off the title when event is completed -->
+                {% if task.check_status == 'event_planner_checked' -%}
+                <p><b><strike>{{ task.title }}</strike></b></p>
+                {%- else -%}
+                <p><b>{{ task.title }}</b></p>
+                {%- endif %}
+            </div>
+            <div class="col text-center">
+                <!-- check/uncheck event if users want to mark event as (in)completed -->
+                {% if task.check_status == 'event_planner_unchecked' -%}
+                <form action="{{ url_for('check_entry') }}" id="event_check" method="post">
+                    <input type="hidden" name="id" value="{{ task.id }}">
+                    <!-- Got information about onchange and javsacript from Stackoverflow: https://stackoverflow.com/questions/18135420/jquery-javascript-submit-form-when-checkbox-is-clicked -->
+                    <button class="mt-1 btn bg-danger btn-primary active" id="check"
+                            onchange="$('#event_check').submit()">Incomplete
+                    </button>
+                </form>
+                {%- else -%}
+                <form action="{{ url_for('uncheck_entry') }}" id="event_uncheck" method="post">
+                    <input type="hidden" name="id" value="{{ task.id }}">
+                    <button class="mt-1 btn bg-success btn-primary active" id="uncheck"
+                            onchange="$('#event_uncheck').submit()">&#10003;
+                    </button>
+                </form>
+                {%- endif %}
+            </div>
+        </div>
+        <div class="row text-center">
+            <div class="col">
+                <p>Category: {{ task.category }}</p>
+            </div>
+            <div class="col">
+                <p>{{ task.st_date }}, {{ task.st_time }}</p>
+            </div>
+        </div>
+        {% if task.description != "" %}
+        <div class="row ">
+            <div class="col text-center">
+                <p>{{ task.description }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col text-center">
+                <!-- delete specific event -->
+                <form action="{{ url_for('delete_entry') }}" method="post">
+                    <input type="hidden" name="id" value="{{ task.id }}">
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                </form>
+            </div>
+            <div class="col text-center">
+                <!-- edit specific event -->
+                <form action="{{ url_for('edit_entry') }}" method="get">
+                    <input type="hidden" name="id" value="{{ task.id }}">
+                    <button type="submit" class="btn btn-info">Edit</button>
+                </form>
+            </div>
+
+            <hr>
+            {% else %}
+            <em>No tasks so far</em>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- script for search bar suggestions found on https://jqueryui.com/autocomplete/ -->
+<script>
+
+    $(function () {
+        var available_tags = {
+        {
+            titles | safe
+        }
+    }
+        ;
+
+        $('#auto').autocomplete({
+            source: available_tags
+        });
+    });
+
+    $(function () {
+        $("#datepicker").datepicker({
+            inline: true
+        });
+    });
+
+    $(function () {
+        $('#dialog').dialog({
+            autoOpen: false,
+            show: {
+                effect: "blind",
+                duration: 100
+            },
+            hide: {
+                effect: "blind",
+                duration: 100
+            }
+        });
+
+        $('#opener').on('click', function () {
+            $('#dialog').show();
+        });
+    });
+
+</script>
+
+
+{% endblock %}

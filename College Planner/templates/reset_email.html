@@ -1,0 +1,9 @@
+<!--An email that is sent to the user who wants tp reset their password-->
+
+<p>Dear user,</p>
+<p>
+    To reset your password
+    <a href="{{ url_for('string_verified',rand_str=rand_str, _external=True) }}">Click here</a>
+</p>
+<p>Sincerely,</p>
+<p>College Planner</p>

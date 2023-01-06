@@ -1,0 +1,241 @@
+<!--
+main_template.html
+
+The 'starter' template for the webpage
+Contains the main page with the nav bar and alerts
+
+Author(s): Anna Sheaffer, Mishwa Bhavsar
+Used Bootstrap for styling and Flask
+Started 10/26/2022
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<title>College Planner</title>
+<head>
+    {% include 'styling.html' %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"
+            integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/"
+            crossorigin="anonymous"></script>
+    <script type="text/javascript">
+
+    const nextYear = new Date().getFullYear() + 1;
+    const myCalender = new CalendarPicker('#myCalendarWrapper', {
+        // If max < min or min > max then the only available day will be today.
+        min: new Date(),
+        max: new Date(nextYear, 10), // NOTE: new Date(nextYear, 10) is "Nov 01 <nextYear>"
+        locale: 'en-US', // Can be any locale or language code supported by Intl.DateTimeFormat, defaults to 'en-US'
+        showShortWeekdays: false // Can be used to fit calendar onto smaller (mobile) screens, defaults to false
+    });
+
+    const currentToDateString = document.getElementById('date');
+    currentToDateString.textContent = myCalender.value.toDateString();
+    // slicing the date string to make it more usable for backend
+    currentToDateString.textContent = currentToDateString.textContent.slice(4,15);
+
+    document.getElementById("date").value = currentToDateString.textContent;
+
+    myCalender.onValueChange((currentValue) => {
+        currentToDateString.textContent = currentValue.toDateString();
+        currentToDateString.textContent = currentToDateString.textContent.slice(4,15);
+        document.getElementById("date").value = currentToDateString.textContent;
+    });
+</script>
+</head>
+
+
+<body>
+
+<!-- navigation bar -->
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark p-3">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">College Planner</a>
+
+        <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle='collapse' href="#add-task" role="button"
+                   aria-expanded="true" aria-controls="collapse">Add Event</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id='add_todo' href="#todo" role="button"
+                   aria-expanded="true" aria-controls="collapse" onclick="add_todo()">
+                    To-Do
+                </a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#reminder" id="dropdown" data-bs-toggle="dropdown"
+                   aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                         class="bi bi-bell-fill" viewBox="0 0 16 16">
+                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
+                    </svg>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdown" data-bs-popper="none">
+                    {% for reminder in reminders %}
+                    <li><a class="dropdown-item">Today: {{ reminder.title }}</a></li>
+                    {% else %}
+                    <li class="m-2"><em> No reminders for today</em></li>
+                    {% endfor %}
+                </ul>
+            </li>
+        </ul>
+
+        <form action="{{ url_for('show_tasks') }}" method="get" class="d-flex mt-3">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-light" type="submit">Filter Posts</button>
+                </div>
+                <select class="form-select" name="category" id="dropdownmenu">
+                    <option>
+                        <a href="/">All</a>
+                    </option>
+                    {% for category in categories %}
+                    <option>
+                        <a href="?category={{ category.category }}">{{ category.category }}</a>
+                    </option>
+                    {% endfor %}
+                </select>
+                <label for="dropdownmenu">Filter by Category</label>
+            </div>
+        </form>
+
+        <ul class="navbar-nav text-white mt-3 mb-3">
+            <li class='nav-item dropdown'>
+                <a class="nav-link dropdown-toggle" id="setdropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                         class="bi bi-person-fill-gear" viewBox="0 0 16 16">
+                        <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-9 8c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4Zm9.886-3.54c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382l.045-.148ZM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0Z"/>
+                    </svg>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark" aria-labeledby="setdropdown" data-bs-popper="none">
+                    <li><a class="dropdown-item">Hello, {{ name }}</a></li>
+                    <li><a class="dropdown-item">Profile</a></li>
+                    {% if session['logged_in'] == True -%}
+                    <li class=dropdown-item'>
+                        <a style="cursor: pointer" class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
+                    </li>
+                    {%- else -%}
+                    <li class='dropdown-item'>
+                        <a style="cursor: pointer" class="dropdown-item" href="{{ url_for('login_settings') }}">Log In</a>
+                    </li>
+                    {%- endif %}
+                </ul>
+            </li>
+        </ul>
+
+        <form class="d-flex mt-3" action="{{ url_for('search_entries') }}" method="get">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-light" type="submit">Search</button>
+                </div>
+                <input type="search" class="form-control mr-sm-2 basicAutoComplete" id='auto' aria-label="Search"
+                       name="search" placeholder="type to search..."
+                       autocomplete="off">
+            </div>
+        </form>
+
+    </div>
+</nav>
+
+<div class="modal" tabindex="-1" role="dialog" id="todo">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Daily To-Do List</h5>
+                <button id="show-close">x</button>
+            </div>
+            <div class="modal-body form-check">
+                <form id='todoAdd' action="{{ url_for('add_todo') }}" method="post" class="add-to-do row">
+                    <input class='form-control my-2' maxlength="100" name="description"
+                       placeholder="Write any details here"/>
+                    <button class="btn btn-secondary" type="submit" id="addTodo">Add To-Do!</button>
+                </form>
+
+                <form id='todoForm' action="{{ url_for('delete_todo') }}" method="post">
+                    {% for todo in todos %}
+                    <input id='hiddenInput' type="checkbox" name="id" value="{{ todo.id }}">
+                    <label class="form-check-label" for="hiddenInput">{{ todo.description }}</label>
+                    <hr>
+                    {% else %}
+                    <em>No todos so far</em>
+
+                    {% endfor %}
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type='button' id='todo-done' class="btn btn-primary">All Done!</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- modal popup for adding an event when a date is clicked -->
+<div class="modal" tabindex="-1" role="dialog" id="eventDetails">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailTitle">Title</h5>
+                <button id="event-close">x</button>
+            </div>
+            <div class="modal-body form-check">
+                <p id="start_time"></p>
+                <p id="end_time"></p>
+            </div>
+            <div class="modal-footer">
+                <input class="btn btn-primary" id='eventClose' value="Close">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'add_task.html' %}
+
+{% for message in get_flashed_messages() %}
+<div class="alert alert-secondary">{{ message }}</div>
+{% endfor %}
+
+
+
+{% block body %}{% endblock %}
+
+    <!-- script for search bar suggestions found on https://jqueryui.com/autocomplete/ -->
+    <script>
+
+
+        $(function () {
+            var available_tags = {{ titles|safe }};
+            $('#auto').autocomplete({
+                source: available_tags
+            });
+        });
+
+        // for the window that shows checkable todos
+        $('#add_todo').click(function () {
+            $('#todo').toggle().draggable();
+        });
+
+        $('#show-close').click(function () {
+            $('#todo').toggle();
+        });
+
+        // for toggling the window closed after clicking 'all done'
+        // and no todos are checked
+        $('#todo-done').click(function () {
+            $('#todoForm').submit();
+            $('#view-todo').toggle();
+        });
+
+    // for toggling the add event dialog box closed when x button clicked
+    $('#event-close').click(function () {
+        $('#eventDetails').toggle();
+    });
+
+    $('#eventClose').click(function() {
+        $('#eventDetails').toggle();
+    });
+
+</script>
+
+</body>
+</html>

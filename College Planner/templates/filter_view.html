@@ -1,0 +1,65 @@
+<!--
+filter_view.html
+
+Page that shows filtered posts
+
+Author(s): Anna Sheaffer
+Used Bootstrap for styling and Flask
+-->
+{% extends "main_template.html" %}
+
+{% block body %}
+<body>
+<div class="m-3">
+    {% if date -%}
+        <h1 class="display-1">Events occurring on {{ date }}</h1>
+    {% else %}
+        <h1 class="display-1">Results for "{{ search }}"</h1>
+    {% endif %}
+</div>
+
+<div id='events' class="container px-3 py-2">
+
+    <div class="show_events">
+        {% for task in tasks %}
+
+        <p>{{ task.description }}</p>
+
+        {% if task.check_status == 'event_planner_checked' -%}
+        <p><strike>{{ task.title }}</strike></p>
+        {%- else -%}
+        <p>{{ task.title }}</p>
+        {%- endif %}
+        {% if task.check_status == 'event_planner_unchecked' -%}
+        <form action="{{ url_for('check_entry') }}" id="event_check" method="post">
+            <input type="hidden" name="id" value="{{ task.id }}">
+            <!-- Got information about onchange and javsacript from Stackoverflow: https://stackoverflow.com/questions/18135420/jquery-javascript-submit-form-when-checkbox-is-clicked -->
+            <button class="mt-1 btn bg-danger btn-primary active" id="check" onchange="$('#event_check').submit()">Mark Completed</button>
+        </form>
+        {%- else -%}
+        <form action="{{ url_for('uncheck_entry') }}" id="event_uncheck" method="post">
+            <input type="hidden" name="id" value="{{ task.id }}">
+            <button class="mt-1 btn bg-success btn-primary active" id="uncheck" onchange="$('#event_uncheck').submit()">Mark Not Finished</button>
+        </form>
+        {%- endif %}
+        <p>{{ task.category }}</p>
+        <p>{{ task.st_date }}</p>
+        <p>{{ task.st_time }}</p>
+        <form action="{{ url_for('delete_entry') }}" method="post">
+            <input type="hidden" name="id" value="{{ task.id }}">
+            <button type="submit" class="btn btn-primary">Delete</button>
+        </form>
+
+        <form action="{{ url_for('edit_entry') }}" method="get">
+            <input type="hidden" name="id" value="{{ task.id }}">
+            <button type="submit" class="btn btn-success">Edit</button>
+        </form>
+
+
+        <hr>
+        {% else %}
+        <em>No results</em>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
