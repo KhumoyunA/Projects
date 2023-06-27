@@ -1,0 +1,25 @@
+<ng-container *ngIf="players" >
+    <div class="rounded border border-2 m-1">
+        <select [(ngModel)]="selectedLeague" (change)="onOptionChangeLeague()">
+            <option *ngFor="let league of leagues" [value]="league.id">{{ league.label }}</option>
+        </select> 
+        
+        <select [(ngModel)]="selectedSeason" (change)="onOptionChangeSeason()">
+            <option *ngFor="let season of seasons" [value]="season.value">{{ season.label }}</option>
+        </select>
+    </div>
+
+    <div class="justify-center">
+        <ng-container *ngFor="let singlePlayer of players.response; let i=index">
+            <app-player [index]="i" [player]="singlePlayer"></app-player>
+        </ng-container> 
+    
+    </div>
+</ng-container>
+<ng-container *ngIf="!players">
+        <div class="flex m-auto h-screen justify-center p-5">
+            <h1 class="text-xl">Sorry, you have surpassed the API call limit of 100 a day. Please, try again later</h1>
+        </div>
+</ng-container>
+
+
